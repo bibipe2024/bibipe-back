@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  email          String           @unique
+  name           String
+  role           Role
+  cars           Car[]
+  carReservation CarReservation[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Car {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  carDetail        CarDetail       @relation(fields: [carDetailId], references: [id])
+  images           Image[]
+  carReservation   CarReservation? @relation(fields: [carReservationId], references: [id])
+  user             User            @relation(fields: [userId], references: [id])
+  userId           String          @db.ObjectId
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  carReservationId String          @db.ObjectId
+  carDetailId      String          @db.ObjectId
+}
+
+model CarDetail {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  brand   String
+  model   String
+  version String
+  year    String
+  city    String
+  state   String
+  totalKm Float
+  Car     Car[]
+}
+
+model CarReservation {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  user                 User     @relation(fields: [userId], references: [id])
+  carId                String   @db.ObjectId
+  userId               String   @db.ObjectId
+  beginReservationDate DateTime
+  endReservationDate   DateTime
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  Car                  Car[]
+}
+
+model Image {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  imageURL  String
+  car       Car?     @relation(fields: [carId], references: [id])
+  carId     String?  @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  HOSTER
+  RENTER
+  GUEST
+}
