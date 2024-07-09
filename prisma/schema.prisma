@@ -26,7 +26,6 @@ model User {
 
 model Car {
   id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  carDetail        CarDetail       @relation(fields: [carDetailId], references: [id])
   images           Image[]
   carReservation   CarReservation? @relation(fields: [carReservationId], references: [id])
   user             User            @relation(fields: [userId], references: [id])
@@ -37,8 +36,7 @@ model Car {
   carDetailId      String          @db.ObjectId
 }
 
-model CarDetail {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
+type CarDetail {
   brand   String
   model   String
   version String
@@ -46,7 +44,6 @@ model CarDetail {
   city    String
   state   String
   totalKm Float
-  Car     Car[]
 }
 
 model CarReservation {
@@ -69,6 +66,28 @@ model Image {
   carId     String?  @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AdContent {
+  id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  code  Int
+  title String
+  texts Adinfo[]
+}
+
+type Adinfo {
+  code     Int
+  text     String
+  image    String?
+  url      String?
+  subtexts SubAdInfo[]
+}
+
+type SubAdInfo {
+  code  Int
+  text  String
+  image String?
+  url   String?
 }
 
 enum Role {
